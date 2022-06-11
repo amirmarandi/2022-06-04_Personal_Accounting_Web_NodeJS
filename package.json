@@ -1,0 +1,22 @@
+{
+  "name": "2022-06-04_personal_accounting_web_nodejs",
+  "version": "1.0.0",
+  "description": "this project is for test and practice for node.js course in 8 june 2022. AMIR MARANDI",
+  "main": "server/server.js",
+  "scripts": {
+    "test": "\"SET NODE_ENV=test\" && nodemon --exec 'npm start'",
+    "start": "node server/server.js"
+  },
+  "engines": {
+    "node": "16.15.0"
+  },
+  "author": "Amir Marandi",
+  "license": "ISC",
+  "dependencies": {
+    "config": "^3.3.7",
+    "express": "^4.18.1",
+    "mongodb": "^4.7.0",
+    "mongoose": "^6.3.6",
+    "validator": "^13.7.0"
+  }
+}
