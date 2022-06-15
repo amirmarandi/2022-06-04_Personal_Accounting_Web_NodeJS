@@ -3,7 +3,7 @@ const validator = require('validator')
 const {mongoose} = require('../db/mongodb')
 
 let UserSchema = new mongoose.Schema ({
-    fullName: {
+    fullname: {
         type: String,
         required: true,
         minlength: 6,
