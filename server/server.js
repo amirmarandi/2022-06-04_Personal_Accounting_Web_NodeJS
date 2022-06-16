@@ -1,32 +1,49 @@
-//locate Database config files to server
-process.env.NODE_CONFIG_DIR = __dirname + '/config'
+//---Config
+process.env.NODE_CONFIG_DIR = __dirname + '/config';
 
-//build-in modules
-const config = require('config')
-const express = require('express')
-const _ = require('lodash')
+const config = require('config');
+const express = require('express');
+const _ = require('lodash');
 
-//My Modules
-const { User } = require('./model/user')
-const app = express()
-app.use(express.json())
+const { User } = require('./model/user');
 
-console.log("*** " + config.get('Level') + " ***")
+console.log(`*** ${String(config.get('Level')).toUpperCase()} ***`);
+
+const app = express();
+app.use(express.json());
 
 app.post('/api/users', (req, res) => {
-    const body = _.pick(req.body, ['fullname', 'email', 'password'])
-    console.log(body)
+    const body = _.pick(req.body, ['fullname', 'email', 'password']);
 
-    let user = new User(body)
+    console.log(body);
+
+    let user = new User(body);
+
     user.save().then((user) => {
-        res.status(200).send(user)
+        res.status(200).send(user);
     }, (err) => {
         res.status(400).json({
-            Error: `Something is went wrong | ${err}`
-        })
+            Error: `Something went wrong. ${err}`
+        });
+    });
+
+});
+
+app.post('/api/login', (req, res) => {
+    const body = _.pick(req.body, ['email', 'password']);
+
+    User.findByCredentials(body.email, body.password).then((user) => {
+        user.generateAuthToken().then((token) => {
+            res.header('x-auth', token).status(200).send(token);
+        }, (err) => {
+            res.status(400).json({
+                Error: `Something went wrong. ${err}`
+            });
+        });
     })
-})
+});
 
 app.listen(config.get('PORT'), () => {
-    console.log(`Server is running on port : ${config.get('PORT')}`);
-})
+    console.log(`Server is running on port ${config.get('PORT')}`);
+});
+
