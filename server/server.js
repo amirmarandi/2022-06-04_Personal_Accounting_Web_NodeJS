@@ -12,35 +12,33 @@ console.log(`*** ${String(config.get('Level')).toUpperCase()} ***`);
 const app = express();
 app.use(express.json());
 
-app.post('/api/users', (req, res) => {
-    const body = _.pick(req.body, ['fullname', 'email', 'password']);
+app.post('/api/users', async (req, res) => {
+    try {
+        const body = _.pick(req.body, ['fullname', 'email', 'password']);
+        let user = new User(body);
 
-    console.log(body);
+        await user.save()
+        res.status(200).send(user)
 
-    let user = new User(body);
+    } catch (err) {
+        res.status(400).json({
+            Error: `Something went wrong. |  ${err}`
+        })
+    }
+});
 
-    user.save().then((user) => {
-        res.status(200).send(user);
-    }, (err) => {
+app.post('/api/login', async (req, res) => {
+    try {
+        const body = _.pick(req.body, ['email', 'password']);
+        let user = await User.findByCredentials(body.email, body.password)
+        let token = await user.generateAuthToken()
+        res.header('x-auth', token).status(200).send(token);
+    } catch (err) {
         res.status(400).json({
             Error: `Something went wrong. ${err}`
         });
-    });
+    }
 
-});
-
-app.post('/api/login', (req, res) => {
-    const body = _.pick(req.body, ['email', 'password']);
-
-    User.findByCredentials(body.email, body.password).then((user) => {
-        user.generateAuthToken().then((token) => {
-            res.header('x-auth', token).status(200).send(token);
-        }, (err) => {
-            res.status(400).json({
-                Error: `Something went wrong. ${err}`
-            });
-        });
-    })
 });
 
 app.listen(config.get('PORT'), () => {
